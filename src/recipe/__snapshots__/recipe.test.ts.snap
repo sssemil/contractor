@@ -1,0 +1,323 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`contract generation > generates a complete, stable, standalone contract for function minimalFixture() {
+  const config = (0,__vite_ssr_import_0__.emptyRecipe)();
+  config.product = {
+    name: "Field Notes",
+    description: "A small notebook for independent researchers to collect observations.",
+    audience: "Independent researchers",
+    requirements: "Create and organize notes.\\nSearch existing observations.",
+    exclusions: "Team collaboration and billing",
+    screens: "Notes list, note editor, settings"
+  };
+  return config;
+} 1`] = `
+"# Field Notes — Project contract
+
+## Product brief
+
+Build the project described below from a fresh repository. Treat this contract as the project brief. Keep the implementation self-contained; do not depend on another project’s source code or private configuration.
+
+### Purpose
+
+> A small notebook for independent researchers to collect observations\\.
+
+### Intended users
+
+> Independent researchers
+
+### MVP requirements
+
+> Create and organize notes\\.
+> Search existing observations\\.
+
+### Out of scope
+
+> Team collaboration and billing
+
+## Stack and structure
+
+Use TypeScript, React, TanStack Start with Vite, and pnpm. Build the interface with Tailwind CSS and shadcn/ui. Use mutually compatible stable versions and commit the lockfile. Keep modules cohesive and expose documented development and production build commands. Start with one application package; organize source by feature.
+
+## Infrastructure
+
+### Deployment target
+
+Deliver a locally runnable Node.js application. Document pnpm install, pnpm dev, the production build, and the supported Node.js start command using TanStack Start’s Nitro deployment adapter. Document setup for selected services. No production hosting target is selected.
+
+## UI / UX
+
+### Interface direction
+
+Use a minimal visual style with sidebar navigation. Set the theme to follow the system preference and use a neutral primary palette.
+
+Keep the design barebones, clear, and functional. Prioritize the core task over decorative elements.
+
+Use responsive layouts, visible keyboard focus, labeled controls, accessible contrast, and clear loading, empty, error, and success states.
+
+### Core screens
+
+> Notes list, note editor, settings
+"
+`;
+
+exports[`contract generation > generates a complete, stable, standalone contract for function vpsFixture() {
+  const config = minimalFixture();
+  config.selected = ["monorepo", "redis", "password", "emailCode", "google", "chromium", "worktrees", "verification"];
+  config.deployment = { target: "vps", vpsProvider: "hetzner", cloudflareDns: true, domain: "notes.example.com" };
+  config.workflow = { tracker: "jira", pr: "origin", questions: "native", remote: "https://github.com/example/field-notes.git" };
+  config.emailFrom = "hello@example.com";
+  return config;
+} 1`] = `
+"# Field Notes — Project contract
+
+## Product brief
+
+Build the project described below from a fresh repository. Treat this contract as the project brief. Keep the implementation self-contained; do not depend on another project’s source code or private configuration.
+
+### Purpose
+
+> A small notebook for independent researchers to collect observations\\.
+
+### Intended users
+
+> Independent researchers
+
+### MVP requirements
+
+> Create and organize notes\\.
+> Search existing observations\\.
+
+### Out of scope
+
+> Team collaboration and billing
+
+## Stack and structure
+
+Use TypeScript, React, TanStack Start with Vite, and pnpm. Build the interface with Tailwind CSS and shadcn/ui. Use mutually compatible stable versions and commit the lockfile. Keep modules cohesive and expose documented development and production build commands.
+
+### Workspace
+
+Use a pnpm workspace managed by Turborepo. Put the application in apps/web and shared UI and domain code in packages/ui and packages/core. Keep build, typecheck, lint, and test tasks scoped to actual packages; do not create empty services.
+
+### Persistence
+
+Use Postgres with Drizzle. Keep the schema and generated migrations in the repository. Read the connection string from DATABASE_URL, supplied through an ignored local environment file or deployment secrets. Document database creation and migration commands. Keep development and production data separate.
+
+### Cache
+
+Use Redis only for explicitly needed cache or coordination behavior. Configure REDIS_URL through environment variables. Define expiration and cache-miss behavior; do not treat cached values as durable product data. Document how to start or connect to the development instance.
+
+## Infrastructure
+
+### Containers
+
+Provide a multi-stage application Dockerfile and Docker Compose deployment. Run the production Node.js build with a non-root user, a health check, and persistent storage only where needed.
+
+Include only the selected services: Postgres and Redis. Document service start, stop, logs, and data-volume behavior. Do not include credentials in images or committed Compose files.
+
+### Email delivery
+
+Use Resend for transactional email. Configure RESEND_API_KEY as a secret and EMAIL_FROM as hello@example\\.com. Verify the sender domain and document its DNS requirements.
+
+Write concise, accessible email templates for the selected authentication flows. For local development, document how to configure a test sender; show an actionable configuration error when email is unavailable. Never claim that an email was sent when the provider rejected it. Keep tokens and codes out of committed files and logs.
+
+### Deployment target
+
+Target a Hetzner VPS using Docker Compose. Build TanStack Start for Node.js using its supported Nitro adapter. Configure a reverse proxy with HTTPS, application health checks, persistent service volumes where needed, and environment secrets outside the image. Document server prerequisites, deployment, restart, logs, backups for selected storage, and rollback to the previous image. Use [server-address] until supplied.
+
+### Domain and DNS
+
+Use Cloudflare DNS for notes\\.example\\.com. Point the required records to [server-address], configure HTTPS with the VPS reverse proxy, and document the proxy and TLS settings. Inspect existing DNS records and preserve unrelated records.
+
+## Authentication
+
+### Authentication foundation
+
+Use Better Auth with its Drizzle adapter and Postgres. Configure BETTER_AUTH_SECRET, the application base URL, trusted origins, and secure session cookies per environment. Enable only the selected login methods. Provide session-aware navigation, signout, protected routes, and appropriate server-side authorization. Keep signin and signup intent clear and preserve the intended post-login destination.
+
+### Email and password
+
+Provide distinct signup and signin flows, email verification and resend, forgot-password, and reset-password screens. Use Better Auth for hashing, tokens, and session handling. Cover invalid credentials, duplicate signup, unverified email, expired links, and retry states without revealing whether an arbitrary address has an account. After signup, explain the verification step; after password reset, return users to signin.
+
+### Email code
+
+Use the Better Auth email OTP flow with short-lived, single-use codes. Distinguish signing in from creating an account; do not silently create an account from the signin-only journey. Provide email entry, code entry, resend cooldown, expiration, invalid-code, and retry states. Rate-limit code requests and verification attempts. After verification, continue to the intended destination.
+
+### Google login
+
+Add Google signin and signup through Better Auth. Document Google Cloud OAuth consent setup, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and the exact authorized origins and callback URLs for local, staging, and production environments. Keep secrets in ignored local files or deployment secrets. If credentials are missing, mark Google login unavailable with setup instructions.
+
+Handle canceled consent and provider errors, and apply explicit account-linking rules to avoid merging unrelated identities.
+
+Use the selected persistent Chromium session for Google Console and consent setup. The user completes password and MFA prompts directly in that browser.
+
+## UI / UX
+
+### Interface direction
+
+Use a minimal visual style with sidebar navigation. Set the theme to follow the system preference and use a neutral primary palette.
+
+Keep the design barebones, clear, and functional. Prioritize the core task over decorative elements.
+
+Use responsive layouts, visible keyboard focus, labeled controls, accessible contrast, and clear loading, empty, error, and success states.
+
+### Core screens
+
+> Notes list, note editor, settings
+
+## Working rules
+
+### Git repository
+
+If the project is not already a Git repository, initialize it and establish the initial branch. Preserve existing history and unrelated changes. Add appropriate ignore rules for dependencies, build output, environment files, and runtime state.
+
+Use this repository remote: https://github\\.com/example/field\\-notes\\.git. Inspect existing remotes before adding or changing one; do not overwrite a different remote without resolving the conflict.
+
+### Isolated worktrees
+
+Work on a dedicated branch in a separate worktree for the Jira ticket. Use a project-specific directory under ~/.codex/worktrees/[project]/[branch]. Record the base revision and check ownership before reusing a worktree. Preserve unrelated work and services.
+
+### Persistent Chromium
+
+Create a persistent project browser profile at [project-root]/.chromium, excluded from Git and restricted to its owner. Share the same visible session with the user for account setup and consent. Bind Chrome DevTools Protocol to loopback on an available port. Record scoped startup instructions and runtime details under .chromium. Reuse this profile across worktrees, preserve it during task cleanup, and detach automation clients without closing the user’s browser.
+
+The user completes passwords and MFA. Keep cookies, tokens, passwords, and client secrets out of commits, tickets, and logs.
+
+### Work tracking
+
+Use Jira. Read the supplied ticket or search for a matching issue before substantive planning or implementation. Before creating an issue, show the project, type, title, and description, ask for acknowledgement, and wait. Preserve default priority and assignment. Update the same issue at planning, implementation, blocker, verification, and review milestones; awaiting review is not Done. Report access blockers and obtain an explicit exception before substituting another tracking system.
+
+### Pull requests
+
+Use Cursor Origin (origin) for pull requests, reviews, and checks; inspect installed command help. Find the existing branch PR before creating a draft. Use a body file for multiline descriptions.
+
+After further pushes, run origin pr refresh and verify that the review snapshot matches the current head revision.
+
+Link the verified pull request from the Jira ticket.
+
+Merge and deployment require explicit authorization, including the selected wrap-up authorization if applicable.
+
+### Agent questions
+
+Use the native agent question tool when user input is needed; use chat if it is unavailable. Wait for an answer before continuing dependent work; continue independent work where possible.
+
+## Acceptance requirements
+
+### Verification
+
+Run the project’s type checks, linting, relevant automated tests, and production build. Exercise the requested MVP journeys with safe data, including desktop/mobile layouts and loading, empty, error, and success states. Fix scoped defects and rerun affected checks. Report exactly which checks passed and any incomplete checks.
+
+Verify every selected authentication method end to end, including signout, protected-route access, invalid or expired credentials, and the return destination. Distinguish mocked provider checks from live provider verification.
+
+Confirm the chosen deployment recipe builds and starts in its intended runtime. Document required configuration and migrations without claiming an unperformed deployment succeeded.
+"
+`;
+
+exports[`contract generation > generates a complete, stable, standalone contract for function workersFixture() {
+  const config = minimalFixture();
+  config.selected = ["password", "emailCode", "google", "verification"];
+  config.deployment = { target: "workers", vpsProvider: "hetzner", cloudflareDns: true, domain: "notes.example.com" };
+  config.workflow.tracker = "markdown";
+  return config;
+} 1`] = `
+"# Field Notes — Project contract
+
+## Product brief
+
+Build the project described below from a fresh repository. Treat this contract as the project brief. Keep the implementation self-contained; do not depend on another project’s source code or private configuration.
+
+### Purpose
+
+> A small notebook for independent researchers to collect observations\\.
+
+### Intended users
+
+> Independent researchers
+
+### MVP requirements
+
+> Create and organize notes\\.
+> Search existing observations\\.
+
+### Out of scope
+
+> Team collaboration and billing
+
+## Stack and structure
+
+Use TypeScript, React, TanStack Start with Vite, and pnpm. Build the interface with Tailwind CSS and shadcn/ui. Use mutually compatible stable versions and commit the lockfile. Keep modules cohesive and expose documented development and production build commands. Start with one application package; organize source by feature.
+
+### Persistence
+
+Use Cloudflare D1 with Drizzle and its D1 adapter. Keep the schema and migrations in the repository. Use local Wrangler D1 for development and separate bindings and databases for staging and production. Document local and remote migration commands; apply migrations only to the intended environment.
+
+## Infrastructure
+
+### Email delivery
+
+Use Resend for transactional email. Configure RESEND_API_KEY as a secret and EMAIL_FROM as \\<verified sender address\\>. Verify the sender domain and document its DNS requirements.
+
+Write concise, accessible email templates for the selected authentication flows. For local development, document how to configure a test sender; show an actionable configuration error when email is unavailable. Never claim that an email was sent when the provider rejected it. Keep tokens and codes out of committed files and logs.
+
+### Deployment target
+
+Target Cloudflare Workers. Use the Cloudflare Vite plugin and Wrangler, with a compatible date and the required Node.js compatibility flag. Use Wrangler local development and environment-specific bindings. Keep staging and production separate. Store secrets using Wrangler secrets and ignored local .dev.vars files. Document build, preview, binding setup, and deployment commands. Do not combine the Workers adapter with a Node.js deployment adapter.
+
+### Domain and DNS
+
+Use Cloudflare DNS for notes\\.example\\.com. Configure the Worker custom domain and document the matching application URL and OAuth callbacks when authentication is selected. Inspect existing DNS records and preserve unrelated records.
+
+## Authentication
+
+### Authentication foundation
+
+Use Better Auth with its Drizzle adapter and D1. Configure BETTER_AUTH_SECRET, the application base URL, trusted origins, and secure session cookies per environment. Enable only the selected login methods. Provide session-aware navigation, signout, protected routes, and appropriate server-side authorization. Keep signin and signup intent clear and preserve the intended post-login destination.
+
+### Email and password
+
+Provide distinct signup and signin flows, email verification and resend, forgot-password, and reset-password screens. Use Better Auth for hashing, tokens, and session handling. Cover invalid credentials, duplicate signup, unverified email, expired links, and retry states without revealing whether an arbitrary address has an account. After signup, explain the verification step; after password reset, return users to signin.
+
+### Email code
+
+Use the Better Auth email OTP flow with short-lived, single-use codes. Distinguish signing in from creating an account; do not silently create an account from the signin-only journey. Provide email entry, code entry, resend cooldown, expiration, invalid-code, and retry states. Rate-limit code requests and verification attempts. After verification, continue to the intended destination.
+
+### Google login
+
+Add Google signin and signup through Better Auth. Document Google Cloud OAuth consent setup, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and the exact authorized origins and callback URLs for local, staging, and production environments. Keep secrets in ignored local files or deployment secrets. If credentials are missing, mark Google login unavailable with setup instructions.
+
+Handle canceled consent and provider errors, and apply explicit account-linking rules to avoid merging unrelated identities.
+
+Have the user complete provider authentication and MFA in their own browser when needed.
+
+## UI / UX
+
+### Interface direction
+
+Use a minimal visual style with sidebar navigation. Set the theme to follow the system preference and use a neutral primary palette.
+
+Keep the design barebones, clear, and functional. Prioritize the core task over decorative elements.
+
+Use responsive layouts, visible keyboard focus, labeled controls, accessible contrast, and clear loading, empty, error, and success states.
+
+### Core screens
+
+> Notes list, note editor, settings
+
+## Working rules
+
+### Work tracking
+
+Track work in local Markdown files under tasks/, with a stable identifier, title, status, requirements, acceptance criteria, and progress notes. Read the matching task before substantive work. Update the same file at planning, implementation, blocker, verification, and review milestones. Awaiting review is not Done.
+
+## Acceptance requirements
+
+### Verification
+
+Run the project’s type checks, linting, relevant automated tests, and production build. Exercise the requested MVP journeys with safe data, including desktop/mobile layouts and loading, empty, error, and success states. Fix scoped defects and rerun affected checks. Report exactly which checks passed and any incomplete checks.
+
+Verify every selected authentication method end to end, including signout, protected-route access, invalid or expired credentials, and the return destination. Distinguish mocked provider checks from live provider verification.
+
+Confirm the chosen deployment recipe builds and starts in its intended runtime. Document required configuration and migrations without claiming an unperformed deployment succeeded.
+"
+`;
