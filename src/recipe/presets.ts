@@ -1,4 +1,5 @@
 import { defaultRecipe, emptyRecipe, type RecipeConfig } from './config';
+import { skillIds } from './skills';
 
 export const presets = [
   { id: 'web', label: 'Web app', description: 'A full app setup with login, storage, and review tools.', detail: 'Postgres · Redis · Cloudflare DNS', color: '#137a6d' },
@@ -14,6 +15,7 @@ export function createPreset(id: PresetId): RecipeConfig {
     config.selected = config.selected.filter((module) => !['password', 'redis', 'tailnet', 'demo', 'wrapup'].includes(module));
   }
   if (id === 'lean') {
+    config.skills.selected = [...skillIds];
     config.selected = ['git', 'cleanup', 'verification'];
     config.workflow.questions = 'native';
   }
@@ -38,6 +40,7 @@ export function applyPreset(current: RecipeConfig, id: PresetId): RecipeConfig {
     deployment: { ...preset.deployment, domain: current.deployment.domain },
     ui: { ...preset.ui, notes: current.ui.notes },
     workflow: { ...preset.workflow, remote: current.workflow.remote },
+    skills: { ...preset.skills, note: current.skills.note },
   };
 }
 
@@ -47,6 +50,7 @@ export function matchingPreset(config: RecipeConfig): PresetId | undefined {
     recipe.deployment.target, recipe.deployment.vpsProvider, recipe.deployment.cloudflareDns,
     recipe.ui.style, recipe.ui.navigation, recipe.ui.theme, recipe.ui.color,
     recipe.workflow.tracker, recipe.workflow.pr, recipe.workflow.questions,
+    [...recipe.skills.selected].sort(), recipe.skills.install,
   ]);
   return presets.find(({ id }) => {
     return signature(config) === signature(createPreset(id));

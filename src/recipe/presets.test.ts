@@ -66,7 +66,10 @@ describe('starting points', () => {
   it('loads old saved choices as written instead of injecting the new defaults', () => {
     const legacy = emptyRecipe();
     legacy.product.name = 'Existing project';
-    expect(parseRecipe(JSON.stringify(legacy))).toEqual(legacy);
-    expect(resolveRecipe(parseRecipe(JSON.stringify(legacy))).active.size).toBe(0);
+    const saved = JSON.parse(JSON.stringify(legacy));
+    delete saved.skills;
+    const parsed = parseRecipe(JSON.stringify(saved));
+    expect(parsed).toEqual(legacy);
+    expect(resolveRecipe(parsed).active.size).toBe(0);
   });
 });

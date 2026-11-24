@@ -1,6 +1,7 @@
 import { modules } from './catalog';
 import type { ModuleId, RecipeConfig, SourceId } from './config';
 import { blockSources, resolveRecipe, type Resolution } from './resolve';
+import { skillIds, skills, skillUrl } from './skills';
 
 export const sections = [
   'Product brief', 'Stack and structure', 'Infrastructure', 'Authentication',
@@ -248,6 +249,23 @@ export function buildContract(config: RecipeConfig) {
   if (config.workflow.questions !== 'none') add('questions', 'Working rules',
     '### Agent questions\n\nUse the native agent question tool when user input is needed; use chat if it is unavailable.' +
     ' Wait for an answer before continuing dependent work; continue independent work where possible.', ['questions']);
+
+  const selectedSkills = skillIds.filter((id) => config.skills.selected.includes(id));
+  if (selectedSkills.length) add('skills', 'Working rules', paragraphs(
+    '### Agent skills',
+    'Before UI work, read and follow the `SKILL.md` for each selected skill that matches the task. Look in the project’s `.agents/skills/` or the agent’s installed skills. Skip these skills for non-UI work.',
+    selectedSkills.map((id) => {
+      const { publisher, usage } = skills[id];
+      const reactRules = id === 'vercel-composition-patterns' || id === 'vercel-react-best-practices'
+        ? ' Read the applicable linked files under `rules/`.' : '';
+      return `- [${id}](${skillUrl(id)}) by ${publisher} — ${usage}.${reactRules}`;
+    }).join('\n'),
+    config.skills.install ? paragraphs(
+      'If a matching skill is missing, run its command from the project root and select your coding agent when prompted.',
+      ['```sh', ...selectedSkills.map((id) => `npx skills add https://github.com/${skills[id].repository} --skill ${id}`), '```'].join('\n'),
+    ) : '',
+    field('Skill usage note', config.skills.note),
+  ), ['skills']);
 
   const ordered = sections.flatMap((section) => blocks.filter((block) => block.section === section));
   const markdown = '# ' + literal(title) + '\n\n' + sections.flatMap((section) => {

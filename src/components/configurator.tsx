@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { modules, sources, type Module } from '@/recipe/catalog';
 import type { Group, RecipeConfig, SourceId } from '@/recipe/config';
 import type { Resolution } from '@/recipe/resolve';
+import { skillIds, skills, skillUrl } from '@/recipe/skills';
 import { Checkbox } from './ui/checkbox';
 import { SelectField, TextField } from './fields';
 import { SourceControl } from './source';
@@ -36,6 +37,8 @@ export function Configurator({ config, onChange, group, resolved, active, onHigh
     onChange({ ...config, workflow: { ...config.workflow, [key]: value } });
   const updateDeployment = <K extends keyof RecipeConfig['deployment']>(key: K, value: RecipeConfig['deployment'][K]) =>
     onChange({ ...config, deployment: { ...config.deployment, [key]: value } });
+  const updateSkills = <K extends keyof RecipeConfig['skills']>(key: K, value: RecipeConfig['skills'][K]) =>
+    onChange({ ...config, skills: { ...config.skills, [key]: value } });
   const wrap = (id: SourceId, children: ReactNode) =>
     <SourceControl key={id} id={id} active={active} onHighlight={onHighlight}>{children}</SourceControl>;
 
@@ -123,6 +126,26 @@ export function Configurator({ config, onChange, group, resolved, active, onHigh
       {wrap('questions', <SelectField label="Agent questions" value={config.workflow.questions} onChange={(value) => updateWorkflow('questions', value)}>
         <option value="none">No additional rules</option><option value="native">Native question tool</option>
       </SelectField>)}
+      {wrap('skills', <>
+        <h3 className="control-heading">Agent skills</h3>
+        <div className="option-list">
+          {skillIds.map((id) => <div className="option-row" key={id}>
+            <Checkbox aria-label={'Include ' + id} aria-describedby={'skill-help-' + id}
+              checked={config.skills.selected.includes(id)}
+              onCheckedChange={(value) => updateSkills('selected', value === true
+                ? [...config.skills.selected, id] : config.skills.selected.filter((selected) => selected !== id))} />
+            <span className="option-text">
+              <a className="option-label underline underline-offset-2" href={skillUrl(id)} target="_blank" rel="noreferrer">{id}</a>
+              <span className="option-description" id={'skill-help-' + id}>{skills[id].publisher} · {skills[id].usage}</span>
+            </span>
+          </div>)}
+          <label className="option-row" htmlFor="install-skills">
+            <Checkbox id="install-skills" checked={config.skills.install} onCheckedChange={(value) => updateSkills('install', value === true)} />
+            <span className="option-label">Include skills.sh install commands</span>
+          </label>
+        </div>
+        <TextField label="Skill usage note (optional)" value={config.skills.note} onChange={(value) => updateSkills('note', value)} multiline />
+      </>)}
       <h3 className="control-heading">Repository & workspace</h3>
       {options(['git', 'worktrees', 'runtime'])}
       {resolved.active.has('git') && <TextField label="Repository remote" value={config.workflow.remote} onChange={(value) => updateWorkflow('remote', value)} placeholder="https://github.com/you/project.git" maxLength={2_048} hint="Optional. Existing remotes are preserved until conflicts are resolved." />}

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { skillIds } from './skills';
 
 export const moduleIds = [
   'monorepo', 'database', 'redis', 'docker', 'auth', 'email',
@@ -7,7 +8,7 @@ export const moduleIds = [
 ] as const;
 export type ModuleId = typeof moduleIds[number];
 export type Group = 'product' | 'stack' | 'infrastructure' | 'interface' | 'workflow';
-export type SourceId = ModuleId | 'product' | 'baseline' | 'deployment' | 'dns' | 'ui' | 'tracking' | 'pr' | 'questions';
+export type SourceId = ModuleId | 'product' | 'baseline' | 'deployment' | 'dns' | 'ui' | 'tracking' | 'pr' | 'questions' | 'skills';
 export const MAX_RECIPE_BYTES = 2_000_000;
 
 const text = z.string().max(30_000);
@@ -43,6 +44,12 @@ export const recipeSchema = z.object({
     remote: z.string().max(2_048),
   }).strict(),
   emailFrom: z.string().max(320),
+  skills: z.object({
+    selected: z.array(z.enum(skillIds)).max(skillIds.length)
+      .refine((ids) => new Set(ids).size === ids.length, 'Duplicate skills'),
+    install: z.boolean(),
+    note: text,
+  }).strict().default(() => ({ selected: [], install: true, note: '' })),
 }).strict();
 
 export type RecipeConfig = z.infer<typeof recipeSchema>;
@@ -56,6 +63,7 @@ export function emptyRecipe(): RecipeConfig {
     ui: { style: 'minimal', navigation: 'sidebar', theme: 'system', color: 'neutral', notes: '' },
     workflow: { tracker: 'none', pr: 'none', questions: 'none', remote: '' },
     emailFrom: '',
+    skills: { selected: [], install: true, note: '' },
   };
 }
 
@@ -66,6 +74,7 @@ export function defaultRecipe(): RecipeConfig {
   config.ui.style = 'polished';
   config.ui.color = 'blue';
   config.workflow = { tracker: 'markdown', pr: 'gh', questions: 'native', remote: '' };
+  config.skills.selected = [...skillIds];
   return config;
 }
 

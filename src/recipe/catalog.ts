@@ -44,6 +44,7 @@ export const sources: Record<SourceId, Source> = {
   tracking: { label: 'Work tracking', color: '#847033', group: 'workflow' },
   pr: { label: 'PR tooling', color: '#5f68a4', group: 'workflow' },
   questions: { label: 'Agent questions', color: '#3a7a86', group: 'workflow' },
+  skills: { label: 'Agent skills', color: '#3a7a86', group: 'workflow' },
   ...Object.fromEntries(modules.map(({ id, label, color, group }) => [id, { label, color, group }])),
 } as Record<SourceId, Source>;
 

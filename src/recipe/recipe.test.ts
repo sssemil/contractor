@@ -121,6 +121,23 @@ describe('recipe resolution', () => {
 });
 
 describe('contract generation', () => {
+  it('includes install commands by default and limits guidance to selected skills', () => {
+    const config = defaultRecipe();
+    expect(config.skills.selected).toHaveLength(5);
+    config.skills.selected = ['vercel-composition-patterns'];
+    config.skills.note = 'Follow existing component patterns.';
+    const output = () => buildContract(config).blocks.find((block) => block.id === 'skills')?.markdown;
+    expect(output()).toContain('[vercel-composition-patterns](https://skills.sh/vercel-labs/agent-skills/vercel-composition-patterns) by Vercel Labs');
+    expect(output()).toContain('linked files under `rules/`');
+    expect(output()).toContain('npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-composition-patterns');
+    expect(output()).not.toContain('frontend-design');
+    expect(output()).toContain('Follow existing component patterns');
+    config.skills.install = false;
+    expect(output()).not.toContain('npx skills add');
+    config.skills.selected = [];
+    expect(output()).toBeUndefined();
+  });
+
   it.each([minimalFixture, vpsFixture, workersFixture])('generates a complete, stable, standalone contract for %s', (fixture) => {
     const config = fixture();
     const contract = buildContract(config);
